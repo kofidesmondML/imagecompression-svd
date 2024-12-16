@@ -1,7 +1,7 @@
 import numpy as np 
 
 
-def trunc_svd(image_array, k):
+def trunc_svd(image_array,k):
     try:
         U, S, Vt = np.linalg.svd(image_array, full_matrices=False)
         S_k = np.diag(S[:k])
