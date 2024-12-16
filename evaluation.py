@@ -46,6 +46,7 @@ def calculate_compression_ratio(original_image_path, compressed_image_path=None)
     
 def measure_computational_time(func, *args, **kwargs):
     start_time = time.time()  # Record the start time
-    func(*args, **kwargs)  # Call the function with provided arguments
+    result = func(*args, **kwargs)  # Call the function and capture its result
     end_time = time.time()  # Record the end time
-    return end_time - start_time
+    computational_time = end_time - start_time  # Calculate elapsed time
+    return computational_time, result
