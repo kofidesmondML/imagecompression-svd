@@ -21,7 +21,7 @@ image.save(color_image_path)
 print(f"Grayscale image saved at: {gray_image_path}")
 print(f"Colored Image saved at: {color_image_path}")
 
-singular_values=[1,5,10,50,100]#150,200,250,300,350,400,450,500,750,1000,1500,1750,2000,2250,2400,2431]
+singular_values=[1,5,10,50,100,150,200,250,300,350,400,450,500,750,1000,1500,1750,2000,2250,2400,2431]
 print('This is the start of the truncated svd')
 tsvd_results=[]
 for k in singular_values:
@@ -133,7 +133,7 @@ for i, col in enumerate(columns):
     plt.legend(loc='best')
     plt.tight_layout()
     
-    image_path = os.path.join(evaluation_path, f"{col}_plot.png")
+    image_path = os.path.join(evaluation_path, f"{col}_plot_gray.png")
     plt.savefig(image_path)
     plt.close()
 

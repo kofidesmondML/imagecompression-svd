@@ -1,4 +1,5 @@
 import numpy as np 
+import cv2 
 
 
 def trunc_svd(image_array,k):
@@ -71,5 +72,79 @@ def randomized_svd(A, k, p=10, q=0):
     product = U[:, :k] @ S @ V.T
 
     return  product
+
+def trunc_svd_colored(image_array, k):
+    try:
+        channels = cv2.split(image_array)
+        print("Channel splitted")
+        compressed_channels = []
+        for idx,channel in enumerate(channels):
+            print(f'processing channel',idx+1)
+            U, S, Vt = np.linalg.svd(channel, full_matrices=False)
+            S_k = np.diag(S[:k])
+            compressed_channel = np.dot(U[:, :k], np.dot(S_k, Vt[:k, :]))
+            compressed_channels.append(compressed_channel)
+        compressed_image = cv2.merge(compressed_channels)
+        return compressed_image
+    except Exception as e:
+        print("Error in performing SVD:", e)
+        return None
+
+def compressed_svd_colored(image_array, k, p=10):
+    compressed_channels = []
+    channels = cv2.split(image_array)
+    
+    for X in channels:
+        l = k + p
+        m, n = X.shape
+        
+        Phi = np.random.randn(l, m)
+        Y = Phi @ X
+        B = Y @ Y.T
+        B = 0.5 * (B + B.T)
+        
+        D, T = np.linalg.eigh(B)
+        idx = np.argsort(D)[::-1]
+        D = D[idx][:k]
+        T = T[:, idx][:, :k]
+        
+        S_tilde = np.sqrt(np.diag(D))
+        V_tilde = Y.T @ T @ np.linalg.inv(S_tilde)
+        U_tilde = X @ V_tilde
+        
+        U, Sigma, Q_T = np.linalg.svd(U_tilde, full_matrices=False)
+        S = np.diag(Sigma[:k])
+        V = V_tilde @ Q_T.T
+        
+        compressed_channel = U[:, :k] @ S @ V[:, :k].T
+        compressed_channels.append(compressed_channel)
+    
+    compressed_image = cv2.merge(compressed_channels)
+    return compressed_image
+
+def randomized_svd_colored(image_array, k, p=10, q=0):
+    compressed_channels = []
+    channels = cv2.split(image_array)
+    
+    for A in channels:
+        l = k + p
+        m, n = A.shape
+        Phi = np.random.randn(n, l)
+        Y = A @ Phi
+        
+        for i in range(q):
+            Y = A @ (A.T @ Y)
+        
+        Q, R = np.linalg.qr(Y, mode='reduced')
+        B = Q.T @ A
+        U_tilde, Sigma, Vt = np.linalg.svd(B, full_matrices=False)
+        U = Q @ U_tilde
+        S = np.diag(Sigma[:k])
+        V = Vt[:k, :].T
+        compressed_channel = U[:, :k] @ S @ V.T
+        
+        compressed_channels.append(compressed_channel)
+    compressed_image = cv2.merge(compressed_channels)
+    return compressed_image
 
     

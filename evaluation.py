@@ -1,5 +1,6 @@
 import numpy as np 
 import os
+import cv2
 import time  
 
 
@@ -50,3 +51,11 @@ def measure_computational_time(func, *args, **kwargs):
     end_time = time.time()  # Record the end time
     computational_time = end_time - start_time  # Calculate elapsed time
     return computational_time, result
+
+def mse_frobenius_colored(image1, image2):
+    mse = 0
+    channels1 = cv2.split(image1)
+    channels2 = cv2.split(image2)
+    for c1, c2 in zip(channels1, channels2):
+        mse += np.mean((c1 - c2) ** 2)
+    return mse / 3
