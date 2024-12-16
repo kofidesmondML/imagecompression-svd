@@ -1,7 +1,8 @@
 import numpy as np 
 import os
 import cv2
-import time  
+import time 
+from PIL import Image 
 
 
 def mse_frobenius(A, B):
@@ -25,9 +26,7 @@ def calculate_compression_ratio(original_image_path, compressed_image_path=None)
     try:
         if not os.path.exists(original_image_path):
             raise FileNotFoundError("The specified original image file does not exist.")
-
         original_size = os.path.getsize(original_image_path)
-
         if compressed_image_path:
             if not os.path.exists(compressed_image_path):
                 raise FileNotFoundError("The specified compressed image file does not exist.")
@@ -59,3 +58,19 @@ def mse_frobenius_colored(image1, image2):
     for c1, c2 in zip(channels1, channels2):
         mse += np.mean((c1 - c2) ** 2)
     return mse / 3
+def save_compressed_image(compressed_image, k, func_name):
+    folder = "image_results"
+    os.makedirs(folder, exist_ok=True)
+    filename = os.path.join(folder, f'{func_name}_compressed_image_k={k}.jpg')
+    compressed_image_scaled = np.clip(compressed_image * 255, 0, 255)
+    compressed_image_rounded = np.round(compressed_image_scaled).astype(np.uint8)
+    img = Image.fromarray(compressed_image_rounded)
+    
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+
+    img.save(filename, format='JPEG')
+    return filename
+
+
+
