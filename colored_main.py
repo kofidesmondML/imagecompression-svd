@@ -16,8 +16,8 @@ image_bgr = cv2.imread('alone.jpg')
 image = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 image = image / 255.0
 
-plt.imshow(image)
-plt.show()
+#plt.imshow(image)
+#plt.show()
 
 colored_image_path = os.path.join(image_path, 'color_alone.jpg')
 image_to_save = (image * 255).astype(np.uint8)
@@ -27,7 +27,7 @@ image_pillow.save(colored_image_path)
 print(f"Image saved to {colored_image_path}")
 
 
-singular_values=[1,5,10]#,50,100]#150,200,250,300,350,400,450,500,750,1000,1500,1750,2000,2250,2400,2431]
+singular_values=[1,5, 10,50,100,150,200,250,300,350,400,450,500,750,1000,1500,1750,2000,2250,2400,2431]
 print('This is the start of the truncated svd')
 tsvd_results=[]
 for k in singular_values:
@@ -114,3 +114,23 @@ for k in singular_values:
     })
 rsvd_3_df=pd.DataFrame(rsvd_3_results)
 print(rsvd_3_df.head())
+
+dfs = [tsvd_df, csvd_df, rsvd_df, rsvd_2_df, rsvd_3_df]
+legend_labels = ['trunc_svd', 'csvd', 'rsvd q=0', 'rsvd q=2', 'rsvd q=3']
+columns = ['time_taken', 'mse', 'compression_ratio']
+titles = ['Computational Time', 'MSE Error', 'Compression Ratio']
+
+for i, col in enumerate(columns):
+    plt.figure(figsize=(10, 5))
+    for idx, df in enumerate(dfs):
+        plt.plot(df['k'], df[col], label=legend_labels[idx])
+    
+    plt.title(titles[i])
+    plt.xlabel('k')
+    plt.ylabel(col)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    
+    image_path = os.path.join(evaluation_path, f"{col}_plot_colored.png")
+    plt.savefig(image_path)
+    plt.close()

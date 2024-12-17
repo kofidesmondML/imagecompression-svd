@@ -65,10 +65,8 @@ def save_compressed_image(compressed_image, k, func_name):
     compressed_image_scaled = np.clip(compressed_image * 255, 0, 255)
     compressed_image_rounded = np.round(compressed_image_scaled).astype(np.uint8)
     img = Image.fromarray(compressed_image_rounded)
-    
     if img.mode != 'RGB':
         img = img.convert('RGB')
-
     img.save(filename, format='JPEG')
     return filename
 
